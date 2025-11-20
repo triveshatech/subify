@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import type {
   CaptionPlacement,
   CaptionSegment,
   CaptionStylePreset,
 } from "@/lib/types/captions";
-import { CAPTION_FONT_STACK } from "../../../remotion/fonts";
+import { CAPTION_FONT_STACK, getCaptionFontStack } from "../../../remotion/fonts";
 
 type CaptionLayerProps = {
   captions: CaptionSegment[];
@@ -44,6 +45,15 @@ export const CaptionLayer = ({
   stylePreset,
   placement,
 }: CaptionLayerProps) => {
+  const [fontFamily, setFontFamily] = useState(CAPTION_FONT_STACK);
+
+  useEffect(() => {
+    // Load fonts asynchronously and update font family
+    getCaptionFontStack().then(setFontFamily).catch(() => {
+      console.warn("Failed to load font stack, using fallback");
+    });
+  }, []);
+
   const active = findActiveCaption(captions, currentTime);
 
   if (!active) {
@@ -67,7 +77,7 @@ export const CaptionLayer = ({
           color: "#fff",
           fontSize: 36,
           fontWeight: 700,
-          fontFamily: CAPTION_FONT_STACK,
+          fontFamily: fontFamily,
           textAlign: "center",
           textTransform: "uppercase",
           letterSpacing: "0.08em",
@@ -91,7 +101,7 @@ export const CaptionLayer = ({
           textAlign: "center",
           fontSize: 40,
           fontWeight: 600,
-          fontFamily: CAPTION_FONT_STACK,
+          fontFamily: fontFamily,
           lineHeight: 1.4,
           textShadow: "0 6px 30px rgba(0,0,0,0.45)",
         }}
@@ -104,7 +114,7 @@ export const CaptionLayer = ({
             padding: "14px 28px",
             borderRadius: 20,
             backgroundColor: "rgba(0,0,0,0.55)",
-            fontFamily: CAPTION_FONT_STACK,
+            fontFamily: fontFamily,
           }}
         >
           {words.map((word) => {
@@ -145,7 +155,7 @@ export const CaptionLayer = ({
         color: "white",
         fontSize: 42,
         fontWeight: 600,
-        fontFamily: CAPTION_FONT_STACK,
+        fontFamily: fontFamily,
         textAlign: "center",
         lineHeight: 1.35,
         textShadow: "0 8px 30px rgba(0,0,0,0.6)",
