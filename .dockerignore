@@ -1,7 +1,6 @@
 .git
 .gitignore
 .next
-.remotion-bundle
 node_modules
 npm-debug.log
 storage/renders

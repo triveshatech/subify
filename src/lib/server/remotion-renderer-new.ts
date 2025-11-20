@@ -68,24 +68,56 @@ const startStaticServer = async () => {
         );
       }
 
-      const server = http.createServer((req, res) => {
-        let filePath = path.join(BUNDLE_DIR, req.url || "/");
+      // Verify critical files exist
+      const indexHtml = path.join(BUNDLE_DIR, "index.html");
+      const bundleJs = path.join(BUNDLE_DIR, "bundle.js");
+      
+      if (!fs.existsSync(indexHtml)) {
+        throw new Error(`Bundle index.html not found at: ${indexHtml}`);
+      }
+      
+      if (!fs.existsSync(bundleJs)) {
+        throw new Error(`Bundle bundle.js not found at: ${bundleJs}`);
+      }
 
-        // Default to index.html
-        if (filePath.endsWith("/")) {
+      // List bundle contents for debugging
+      const bundleContents = fs.readdirSync(BUNDLE_DIR);
+      console.log("[remotion] Bundle directory contents:", bundleContents);
+
+      // Verify bundle.js contains getStaticCompositions
+      const bundleJsContent = fs.readFileSync(bundleJs, "utf8");
+      if (!bundleJsContent.includes("getStaticCompositions")) {
+        console.error("[remotion] WARNING: bundle.js does not contain getStaticCompositions!");
+        console.error("[remotion] Bundle.js size:", bundleJsContent.length, "bytes");
+        console.error("[remotion] First 500 chars:", bundleJsContent.substring(0, 500));
+      } else {
+        console.log("[remotion] ✓ bundle.js contains getStaticCompositions");
+      }
+
+      const server = http.createServer((req, res) => {
+        // Parse URL and remove query strings
+        const urlPath = (req.url || "/").split("?")[0];
+        let filePath = path.join(BUNDLE_DIR, urlPath);
+
+        // Default to index.html for directory requests
+        if (filePath.endsWith("/") || fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
           filePath = path.join(filePath, "index.html");
         }
 
         // Security: prevent directory traversal
         const normalizedPath = path.normalize(filePath);
         if (!normalizedPath.startsWith(BUNDLE_DIR)) {
+          console.error("[remotion] Forbidden path:", urlPath);
           res.writeHead(403);
           res.end("Forbidden");
           return;
         }
 
+        console.log("[remotion] Serving:", urlPath, "->", path.relative(BUNDLE_DIR, filePath));
+
         fs.stat(filePath, (err, stats) => {
           if (err || !stats.isFile()) {
+            console.error("[remotion] File not found:", filePath, err?.message);
             res.writeHead(404);
             res.end("Not Found");
             return;
@@ -96,9 +128,15 @@ const startStaticServer = async () => {
             "Content-Type": mimeType,
             "Content-Length": stats.size,
             "Cache-Control": "no-cache",
+            "Access-Control-Allow-Origin": "*",
           });
 
-          createReadStream(filePath).pipe(res);
+          const stream = createReadStream(filePath);
+          stream.pipe(res);
+          stream.on("error", (streamErr) => {
+            console.error("[remotion] Stream error:", streamErr);
+            res.destroy();
+          });
         });
       });
 

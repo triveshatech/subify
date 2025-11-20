@@ -32,8 +32,18 @@ COPY . .
 
 RUN npm run build
 
+# Make startup script executable
+RUN chmod +x /app/scripts/startup.sh
+
+# Verify bundle was created during build
+RUN if [ ! -d "/app/.remotion-bundle" ]; then \
+  echo "ERROR: Remotion bundle not created during build!"; \
+  echo "Build log should show bundle-remotion output"; \
+  exit 1; \
+  fi
+
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["/app/scripts/startup.sh"]
