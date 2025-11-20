@@ -9,6 +9,7 @@ Remotion exports now run inside a long-lived Dockerized Node 20 server (Railway)
 Fixed critical issue where Remotion bundler was conflicting with Next.js server on port 3000. See `REMOTION_FIX.md` for complete details.
 
 **Key Changes:**
+
 - Removed "use client" from Remotion entry files
 - Added `REMOTION_HEADLESS=true` and production mode configuration
 - Enhanced logging throughout bundle/render pipeline
@@ -38,11 +39,11 @@ Fixed critical issue where Remotion bundler was conflicting with Next.js server 
 
 ## Troubleshooting
 
-| Symptom | Likely Cause | Fix |
-| --- | --- | --- |
+| Symptom                                        | Likely Cause                              | Fix                                                                                               |
+| ---------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `ENOENT .../compositor-linux-x64-gnu/remotion` | Docker layer cached without optional deps | Delete `node_modules` locally, reinstall, rebuild the Docker image so optional deps are copied in |
-| `Missing uploaded video reference` | `/api/uploads` temp id expired | Re-upload from the client; uploads expire after ~30 minutes |
-| `Socket hang up` / timeout | Render exceeded container resources | Scale the Railway service (more CPU/RAM) or reduce resolution/FPS |
+| `Missing uploaded video reference`             | `/api/uploads` temp id expired            | Re-upload from the client; uploads expire after ~30 minutes                                       |
+| `Socket hang up` / timeout                     | Render exceeded container resources       | Scale the Railway service (more CPU/RAM) or reduce resolution/FPS                                 |
 
 ## Alternatives
 

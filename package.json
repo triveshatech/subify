@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run bundle:remotion && next build",
+    "bundle:remotion": "node scripts/bundle-remotion.mjs",
     "start": "next start -p ${PORT:-3000}",
     "lint": "eslint",
     "render:sample": "remotion render remotion/Root.tsx CaptionComposition out/sample-output.mp4 --props=./assets/sample-captions.json",

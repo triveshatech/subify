@@ -15,7 +15,7 @@ import {
   deleteTempUpload,
   describeTempUpload,
 } from "@/lib/server/temp-upload-store";
-import { renderCaptionVideo } from "@/lib/server/remotion-renderer";
+import { renderCaptionVideo } from "@/lib/server/remotion-renderer-new";
 
 export const runtime = "nodejs";
 

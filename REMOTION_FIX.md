@@ -5,8 +5,8 @@
 When clicking "Export" on Railway deployment, the application was failing with:
 
 ```
-Error while getting compositions: Tried to go to http://localhost:3000/index.html 
-and verify that it is a Remotion project by checking if window.getStaticCompositions 
+Error while getting compositions: Tried to go to http://localhost:3000/index.html
+and verify that it is a Remotion project by checking if window.getStaticCompositions
 is defined. However, the function was undefined...
 ```
 
@@ -27,6 +27,7 @@ is defined. However, the function was undefined...
 ### 1. Removed "use client" from Remotion Entry Files
 
 **Files Modified:**
+
 - `remotion/Root.tsx`
 - `remotion/CaptionComposition.tsx`
 
@@ -37,6 +38,7 @@ is defined. However, the function was undefined...
 **File:** `src/lib/server/remotion-renderer.ts`
 
 Added critical environment variables:
+
 ```typescript
 process.env.REMOTION_HEADLESS = "true";
 process.env.REMOTION_BUILD_MODE = "production"; // In production
@@ -47,8 +49,10 @@ process.env.REMOTION_BUILD_MODE = "production"; // In production
 ### 3. Improved Webpack Configuration
 
 Added explicit webpack mode setting:
+
 ```typescript
-config.mode = process.env.NODE_ENV === "production" ? "production" : "development";
+config.mode =
+  process.env.NODE_ENV === "production" ? "production" : "development";
 ```
 
 **Why:** Ensures webpack builds the bundle with appropriate optimizations for the environment.
@@ -56,6 +60,7 @@ config.mode = process.env.NODE_ENV === "production" ? "production" : "developmen
 ### 4. Added Comprehensive Logging
 
 Enhanced logging throughout the bundling and rendering process:
+
 - Bundle creation location and type
 - Composition selection details
 - Render progress with frame counts
@@ -76,11 +81,13 @@ Enhanced logging throughout the bundling and rendering process:
 ## Industry-Standard Best Practices Applied
 
 ### 1. **Separation of Concerns**
+
 - Remotion bundle runs on its own port (auto-assigned)
 - Next.js server remains on port 3000
 - No port conflicts
 
 ### 2. **Proper Error Handling**
+
 ```typescript
 .catch((error) => {
   console.error("[remotion] Failed to select composition:", error);
@@ -90,16 +97,19 @@ Enhanced logging throughout the bundling and rendering process:
 ```
 
 ### 3. **Environment-Aware Configuration**
+
 - Different settings for development vs production
 - Headless mode for server environments
 - Proper temp directory usage
 
 ### 4. **Logging & Observability**
+
 - Structured logging with `[remotion]` prefix
 - Detailed progress tracking
 - Error context preservation
 
 ### 5. **Resource Management**
+
 - Temp files properly cleaned up
 - Bundle caching disabled in serverless (prevents permission issues)
 - Explicit data directory configuration
@@ -107,6 +117,7 @@ Enhanced logging throughout the bundling and rendering process:
 ## Testing the Fix
 
 ### Local Testing
+
 ```bash
 npm run build
 npm run start
@@ -122,6 +133,7 @@ Then test the export functionality.
 4. Test export functionality
 
 ### Expected Log Output (Success)
+
 ```
 [remotion] Starting bundle process...
 [remotion] Entry point: /app/remotion/Root.tsx
@@ -144,17 +156,20 @@ Then test the export functionality.
 ### If Issues Persist
 
 1. **Check Chromium Installation**
+
    ```bash
    # In Docker container
    which chromium || which chromium-browser
    ```
 
 2. **Verify FFmpeg**
+
    ```bash
    ffmpeg -version
    ```
 
 3. **Check Temp Directory Permissions**
+
    ```bash
    ls -la /tmp/remotion-*
    ```
@@ -166,6 +181,7 @@ Then test the export functionality.
 ### Performance Optimization
 
 For production at scale, consider:
+
 - **Remotion Lambda**: AWS Lambda-based rendering (official solution)
 - **Queue System**: Redis/Bull for job processing
 - **CDN**: CloudFront/CloudFlare for video delivery
