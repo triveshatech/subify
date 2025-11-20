@@ -1,0 +1,131 @@
+{
+  "id": "2f8a0375-75f4-4a3d-afd9-efc346109276",
+  "captions": [
+    {
+      "id": 0,
+      "start": 0,
+      "end": 4,
+      "text": "I am happy. मैं खुश हूँ।",
+      "words": [
+        {
+          "id": 0,
+          "text": "I",
+          "start": 0,
+          "end": 0.667
+        },
+        {
+          "id": 1,
+          "text": "am",
+          "start": 0.667,
+          "end": 1.334
+        },
+        {
+          "id": 2,
+          "text": "happy.",
+          "start": 1.333,
+          "end": 2
+        },
+        {
+          "id": 3,
+          "text": "मैं",
+          "start": 2,
+          "end": 2.667
+        },
+        {
+          "id": 4,
+          "text": "खुश",
+          "start": 2.667,
+          "end": 3.334
+        },
+        {
+          "id": 5,
+          "text": "हूँ।",
+          "start": 3.333,
+          "end": 4
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "start": 4,
+      "end": 8,
+      "text": "I am happy. I am sad.",
+      "words": [
+        {
+          "id": 6,
+          "text": "I",
+          "start": 4,
+          "end": 4.667
+        },
+        {
+          "id": 7,
+          "text": "am",
+          "start": 4.667,
+          "end": 5.334
+        },
+        {
+          "id": 8,
+          "text": "happy.",
+          "start": 5.333,
+          "end": 6
+        },
+        {
+          "id": 9,
+          "text": "I",
+          "start": 6,
+          "end": 6.667
+        },
+        {
+          "id": 10,
+          "text": "am",
+          "start": 6.667,
+          "end": 7.334
+        },
+        {
+          "id": 11,
+          "text": "sad.",
+          "start": 7.333,
+          "end": 8
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "start": 8,
+      "end": 10,
+      "text": "मैं दुखी हूँ।",
+      "words": [
+        {
+          "id": 12,
+          "text": "मैं",
+          "start": 8,
+          "end": 8.667
+        },
+        {
+          "id": 13,
+          "text": "दुखी",
+          "start": 8.667,
+          "end": 9.334
+        },
+        {
+          "id": 14,
+          "text": "हूँ।",
+          "start": 9.333,
+          "end": 10
+        }
+      ]
+    }
+  ],
+  "stylePreset": "standard",
+  "placement": "bottom",
+  "duration": 23.289592,
+  "language": "hi-en",
+  "videoMetadata": {
+    "name": "HinEnglish.mp4",
+    "type": "video/mp4",
+    "size": 5952118,
+    "lastModified": 1763619972985
+  },
+  "createdAt": "2025-11-20T06:26:27.910Z",
+  "updatedAt": "2025-11-20T06:26:27.910Z"
+}

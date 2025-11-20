@@ -1,0 +1,12 @@
+{
+  "captions": [
+    {"id": 0, "start": 0.0, "end": 2.5, "text": "Namaste dosto, welcome back to the channel!"},
+    {"id": 1, "start": 2.5, "end": 5.0, "text": "Aaj hum ek quick Hinglish caption demo dekh rahe hain."},
+    {"id": 2, "start": 5.0, "end": 8.0, "text": "Video pe subtitles overlay karna super easy hai."},
+    {"id": 3, "start": 8.0, "end": 11.5, "text": "Chaliye, captions ko teen styles mein preview karte hain."}
+  ],
+  "stylePreset": "standard",
+  "placement": "bottom",
+  "videoSrc": "samples/sample-input.mp4",
+  "fps": 30
+}
