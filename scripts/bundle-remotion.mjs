@@ -36,45 +36,17 @@ if (!fs.existsSync(PUBLIC_DIR)) {
 const applyWebpackAlias = (config) => {
   const SRC_DIR = path.join(ROOT_DIR, "src");
 
+  // Preserve existing configuration
   config.resolve = config.resolve || {};
   config.resolve.alias = {
     ...(config.resolve.alias || {}),
     "@": SRC_DIR,
-    react: path.join(ROOT_DIR, "node_modules", "react"),
-    "react-dom": path.join(ROOT_DIR, "node_modules", "react-dom"),
   };
-  config.resolve.extensions = [
-    ...new Set([
-      ...(config.resolve.extensions || []),
-      ".ts",
-      ".tsx",
-      ".js",
-      ".jsx",
-      ".mjs",
-    ]),
-  ];
-
-  config.mode = "production";
-  config.plugins = config.plugins || [];
-
-  // Ignore studio modules
-  const ignorePlugin = {
-    apply(compiler) {
-      if (compiler?.hooks?.normalModuleFactory?.tap) {
-        compiler.hooks.normalModuleFactory.tap("IgnoreStudioPlugin", (nmf) => {
-          if (nmf?.hooks?.beforeResolve?.tap) {
-            nmf.hooks.beforeResolve.tap("IgnoreStudioPlugin", (resolveData) => {
-              if (resolveData?.request?.includes("@remotion/studio")) {
-                return false;
-              }
-            });
-          }
-        });
-      }
-    },
-  };
-
-  config.plugins.push(ignorePlugin);
+  
+  // Don't override extensions, let Remotion handle it
+  // Don't set mode, let Remotion handle it
+  // Don't add plugins that might interfere
+  
   return config;
 };
 
