@@ -45,9 +45,6 @@ const REMOTION_NATIVE_PACKAGE_DIRS = REMOTION_NATIVE_PACKAGES.map(resolvePackage
 
 const nextConfig: NextConfig = {
   serverExternalPackages: REMOTION_NATIVE_PACKAGES,
-  experimental: {
-    serverComponentsExternalPackages: REMOTION_NATIVE_PACKAGES,
-  },
   outputFileTracingIncludes: {
     "/api/sessions/[sessionId]/export": [
       REMOTION_DIR,

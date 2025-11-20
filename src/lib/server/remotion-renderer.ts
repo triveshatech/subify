@@ -124,6 +124,8 @@ const applyWebpackAlias = (config: MutableWebpackConfig) => {
   config.resolve.alias = {
     ...(config.resolve.alias ?? {}),
     "@": SRC_DIR,
+    react: path.join(ROOT_DIR, "node_modules", "react"),
+    "react-dom": path.join(ROOT_DIR, "node_modules", "react-dom"),
   };
   config.resolve.extensions = Array.from(
     new Set([...(config.resolve.extensions ?? []), ".ts", ".tsx", ".js", ".jsx", ".mjs"]),
