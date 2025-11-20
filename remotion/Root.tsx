@@ -1,5 +1,3 @@
-"use client";
-
 import { Composition, registerRoot } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { CaptionComposition } from "./CaptionComposition";

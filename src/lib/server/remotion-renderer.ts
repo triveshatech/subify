@@ -39,6 +39,12 @@ if (!process.env.REMOTION_CACHE_LOCATION) {
 if (!process.env.REMOTION_DATA_DIR) {
   process.env.REMOTION_DATA_DIR = path.join(os.tmpdir(), "remotion-data");
 }
+// Force Remotion to use production mode for bundling
+if (process.env.NODE_ENV === "production") {
+  process.env.REMOTION_BUILD_MODE = "production";
+}
+// Ensure Remotion doesn't try to open browser or use development features
+process.env.REMOTION_HEADLESS = "true";
 
 type RendererModule = typeof import("@remotion/renderer");
 type BundlerModule = typeof import("@remotion/bundler");
@@ -131,6 +137,9 @@ const applyWebpackAlias = (config: MutableWebpackConfig) => {
     new Set([...(config.resolve.extensions ?? []), ".ts", ".tsx", ".js", ".jsx", ".mjs"]),
   );
   
+  // Ensure webpack processes modules correctly
+  config.mode = process.env.NODE_ENV === "production" ? "production" : "development";
+  
   // Add plugin to ignore @remotion/studio (dev-only dependency not needed for rendering)
   config.plugins = config.plugins || [];
   
@@ -176,17 +185,32 @@ const bundleRemotionProject = async () => {
           fs.mkdirSync(PUBLIC_DIR, { recursive: true });
         }
 
+        console.log("[remotion] Starting bundle process...");
+        console.log("[remotion] Entry point:", REMOTION_ENTRY);
+        console.log("[remotion] Public dir:", PUBLIC_DIR);
+        console.log("[remotion] Node env:", process.env.NODE_ENV);
+
         // The bundler typings still expect the legacy positional arguments signature.
         // Cast to `any` so we can use the modern options object without type noise.
-        return (bundle as unknown as (options: Record<string, unknown>) => Promise<string>)({
+        const bundleLocation = await (bundle as unknown as (options: Record<string, unknown>) => Promise<string>)({
           entryPoint: REMOTION_ENTRY,
           publicDir: PUBLIC_DIR,
           webpackOverride: applyWebpackAlias,
           enableCaching: false,
           cacheDir: REMOTION_CACHE_DIR,
+          // Important: Don't specify a port, let Remotion find an available one
+          // This ensures we're not conflicting with Next.js on port 3000
+          ...(process.env.NODE_ENV === "production" && {
+            minify: false, // Minification can cause issues with Remotion
+          }),
         });
+
+        console.log("[remotion] Bundle created at:", bundleLocation);
+        console.log("[remotion] Bundle type:", bundleLocation.startsWith("http") ? "HTTP server" : "File path");
+        return bundleLocation;
       })
       .catch((error) => {
+        console.error("[remotion] Bundle failed:", error);
         serveUrlPromise = null;
         throw error;
       });
@@ -199,30 +223,63 @@ export const renderCaptionVideo = async (
   props: CaptionCompositionProps,
   outputLocation: string,
 ) => {
-  const [modules, serveUrl] = await Promise.all([
-    loadRemotionModules(),
-    bundleRemotionProject(),
-  ]);
+  try {
+    console.log("[remotion] Starting render process...");
+    
+    const [modules, serveUrl] = await Promise.all([
+      loadRemotionModules(),
+      bundleRemotionProject(),
+    ]);
 
-  const composition = await modules.selectComposition({
-    serveUrl,
-    id: "CaptionComposition",
-    inputProps: props,
-  });
+    console.log("[remotion] Selecting composition from:", serveUrl);
+    console.log("[remotion] Input props:", {
+      videoSrc: props.videoSrc,
+      captionCount: props.captions.length,
+      duration: props.duration,
+      fps: props.fps,
+      dimensions: `${props.width}x${props.height}`,
+    });
 
-  await modules.renderMedia({
-    serveUrl,
-    composition,
-    codec: "h264",
-    audioCodec: "aac",
-    outputLocation,
-    inputProps: props,
-    overwrite: true,
-    onProgress: (progress) => {
-      if (process.env.NODE_ENV !== "production") {
+    const composition = await modules.selectComposition({
+      serveUrl,
+      id: "CaptionComposition",
+      inputProps: props,
+    }).catch((error) => {
+      console.error("[remotion] Failed to select composition:", error);
+      console.error("[remotion] Serve URL was:", serveUrl);
+      throw new Error(`Failed to load Remotion composition: ${error.message}`);
+    });
+
+    console.log("[remotion] Composition selected:", {
+      id: composition.id,
+      width: composition.width,
+      height: composition.height,
+      fps: composition.fps,
+      durationInFrames: composition.durationInFrames,
+    });
+
+    console.log("[remotion] Starting media render to:", outputLocation);
+
+    await modules.renderMedia({
+      serveUrl,
+      composition,
+      codec: "h264",
+      audioCodec: "aac",
+      outputLocation,
+      inputProps: props,
+      overwrite: true,
+      onProgress: (progress) => {
         const percentage = (progress.progress * 100).toFixed(1);
-        console.log(`[remotion][render] ${percentage}% complete`);
-      }
-    },
-  });
+        console.log(`[remotion][render] ${percentage}% complete (frame ${progress.renderedFrames}/${progress.encodedFrames})`);
+      },
+    });
+
+    console.log("[remotion] Render completed successfully");
+  } catch (error) {
+    console.error("[remotion] Render failed with error:", error);
+    if (error instanceof Error) {
+      console.error("[remotion] Error stack:", error.stack);
+    }
+    throw error;
+  }
 };

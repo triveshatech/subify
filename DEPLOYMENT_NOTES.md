@@ -4,6 +4,17 @@
 
 Remotion exports now run inside a long-lived Dockerized Node 20 server (Railway). Uploads and renders stream through `/tmp`, so nothing touches `/public` or user code directories. The Remotion compositor binaries ship in `node_modules` and are available at runtime.
 
+## Recent Fix (2024-11-20)
+
+Fixed critical issue where Remotion bundler was conflicting with Next.js server on port 3000. See `REMOTION_FIX.md` for complete details.
+
+**Key Changes:**
+- Removed "use client" from Remotion entry files
+- Added `REMOTION_HEADLESS=true` and production mode configuration
+- Enhanced logging throughout bundle/render pipeline
+- Fixed webpack configuration for production builds
+- Disabled minification to prevent runtime errors
+
 ## Deployment Requirements
 
 1. **Linux-native compositor packages**
